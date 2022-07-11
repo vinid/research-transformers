@@ -49,27 +49,25 @@ class OptimalTransformer:
 
     def objective(self, trial: optuna.Trial):
 
-        if self.parameters is not None:
-
-            training_args = TrainingArguments(
-                output_dir='ade-test', learning_rate=trial.suggest_loguniform('learning_rate', low=4e-5, high=0.01),
-                weight_decay=trial.suggest_loguniform('weight_decay', 4e-5, 0.01),
-                num_train_epochs=1,
-                per_device_train_batch_size=8,
-                per_device_eval_batch_size=8,
-                disable_tqdm=False,
-                metric_for_best_model='loss',
-                load_best_model_at_end=True,
-                seed=random.randint(0, 1000),
-            )
-            trainer = Trainer(model_init=self.model_init,
-                              args=training_args,
-                              train_dataset=self.dataset["train"],
-                              eval_dataset=self.dataset["validation"]
-                              )
-            trainer.train()
-            metrics = trainer.evaluate()
-            return metrics["eval_loss"]
+        training_args = TrainingArguments(
+            output_dir='ade-test', learning_rate=trial.suggest_loguniform('learning_rate', low=4e-5, high=0.01),
+            weight_decay=trial.suggest_loguniform('weight_decay', 4e-5, 0.01),
+            num_train_epochs=1,
+            per_device_train_batch_size=8,
+            per_device_eval_batch_size=8,
+            disable_tqdm=False,
+            metric_for_best_model='loss',
+            load_best_model_at_end=True,
+            seed=random.randint(0, 1000),
+        )
+        trainer = Trainer(model_init=self.model_init,
+                          args=training_args,
+                          train_dataset=self.dataset["train"],
+                          eval_dataset=self.dataset["validation"]
+                          )
+        trainer.train()
+        metrics = trainer.evaluate()
+        return metrics["eval_loss"]
 
     def run(self, n_trials):
         study = optuna.create_study(study_name='hyper-parameter-search',
