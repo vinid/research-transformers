@@ -49,7 +49,7 @@ class OptimalTransformer:
         return AutoModel.from_pretrained(self.model_name)
 
     def objective(self, trial: optuna.Trial):
-        tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
+        tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_name)
         training_args = TrainingArguments(
             output_dir='ade-test', learning_rate=trial.suggest_loguniform('learning_rate', low=4e-5, high=0.01),
             weight_decay=trial.suggest_loguniform('weight_decay', 4e-5, 0.01),
