@@ -57,7 +57,7 @@ class OptimalTransformer:
                 num_train_epochs=trial.suggest_int('num_train_epochs', low=2, high=5),
                 per_device_train_batch_size=8,
                 per_device_eval_batch_size=8,
-                disable_tqdm=True,
+                disable_tqdm=False,
                 metric_for_best_model='loss',
                 load_best_model_at_end=True,
                 seed=random.randint(0, 1000),
@@ -65,10 +65,10 @@ class OptimalTransformer:
             trainer = Trainer(model_init=self.model_init,
                               args=training_args,
                               train_dataset=self.dataset["train"],
-                              eval_dataset=self.dataset["eval"]
+                              eval_dataset=self.dataset["validation"]
                               )
-            metrics = trainer.evaluate(self.dataset["eval"])
-            return 4
+            metrics = trainer.evaluate()
+            return metrics["eval_loss"]
 
     def run(self):
         study = optuna.create_study(study_name='hyper-parameter-search',
