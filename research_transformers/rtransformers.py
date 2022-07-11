@@ -55,7 +55,7 @@ class OptimalTransformer:
             output_dir=f"{self.experiment_name}_{trial.number}",
             learning_rate=trial.suggest_loguniform('learning_rate', low=4e-5, high=0.01),
             weight_decay=trial.suggest_loguniform('weight_decay', 4e-5, 0.01),
-            num_train_epochs=1,
+            num_train_epochs=trial.suggest_int("num_train_epochs", 1, 5),
             per_device_train_batch_size=8,
             per_device_eval_batch_size=8,
             disable_tqdm=False,
