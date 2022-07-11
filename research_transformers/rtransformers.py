@@ -2,7 +2,7 @@ import random
 from datasets import Dataset
 import optuna
 from typing import Callable
-from transformers import AutoModel, AutoTokenizer, Trainer, TrainingArguments
+from transformers import AutoModel, AutoModelForSequenceClassification, AutoTokenizer, Trainer, TrainingArguments
 
 class RepeatedTransformer:
 
@@ -37,8 +37,9 @@ class RepeatedTransformer:
 
 class OptimalTransformer:
 
-    def __init__(self, model_name, tokenizer_name, experiment_name, dataset: Dataset, compute_metrics: Callable, parameters: dict):
+    def __init__(self, model_name, tokenizer_name, num_labels, experiment_name, dataset: Dataset, compute_metrics: Callable, parameters: dict):
         self.model_name = model_name
+        self.num_labels = num_labels
         self.tokenizer_name = tokenizer_name
         self.experiment_name = experiment_name
         self.dataset = dataset
@@ -46,7 +47,7 @@ class OptimalTransformer:
         self.parameters = parameters
 
     def model_init(self):
-        return AutoModel.from_pretrained(self.model_name)
+        return AutoModelForSequenceClassification.from_pretrained(self.model_name, num_labels=self.num_labels)
 
     def objective(self, trial: optuna.Trial):
         tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_name)
@@ -59,7 +60,6 @@ class OptimalTransformer:
             disable_tqdm=False,
             eval_steps= 50,
             save_steps= 50,
-
             evaluation_strategy="steps",
             metric_for_best_model='loss',
             load_best_model_at_end=True,
